@@ -41,6 +41,7 @@ class ApiService {
     }
   }
 
+
   // تابع برای دریافت اطلاعات کاربر جاری
   Future<Map<String, dynamic>?> getCurrentUser() async {
     try {
@@ -68,26 +69,27 @@ class ApiService {
       return null;
     }
   }
-  // تابع برای بروزرسانی session (در صورت استفاده از refresh token)
-  Future<Map<String, dynamic>?> refreshSession(String refreshToken) async {
+
+
+  // تابع برای دریافت لیست کتگوری‌ها
+  Future<List<String>?> getCategories() async {
     try {
-      Response response = await _dio.post(
-        '$baseUrl/auth/refresh',
-        data: {
-          "refreshToken": refreshToken,  // ارسال refreshToken
-        },
+      Response response = await _dio.get(
+        '$baseUrl/products/category-list',
         options: Options(
           headers: {'Content-Type': 'application/json'},
         ),
       );
 
       if (response.statusCode == 200) {
-        return response.data;  // داده‌های توکن جدید را برمی‌گرداند
+        // response.data یک List<dynamic> است
+        return List<String>.from(response.data);
       } else {
+        print("Failed to get categories: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print("Error refreshing session: $e");
+      print("Error fetching categories: $e");
       return null;
     }
   }

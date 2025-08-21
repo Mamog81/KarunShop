@@ -61,18 +61,17 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushReplacementNamed(context, '/login');  // هدایت به صفحه ورود
   }
 
-  // تابع برای ویرایش اطلاعات کاربر (قرار دادن جای خالی برای بعداً)
-  void _editUserInfo() {
-    // اینجا می‌توانید کد برای ویرایش اطلاعات کاربر اضافه کنید
+  void _editUserInfo()  {
+    Navigator.pushNamed(context, '/profile');
   }
 
-  // تابع برای ویرایش اطلاعات کاربر (قرار دادن جای خالی برای بعداً)
-  void _openCart() {
-    // اینجا می‌توانید کد برای ویرایش اطلاعات کاربر اضافه کنید
+
+  void _openCart()  {
+    Navigator.pushNamed(context, '/cart');
   }
 
-  void _openCategories(){
-
+  void _openCategories()  {
+    Navigator.pushNamed(context, '/categories');
   }
 
   @override
@@ -97,20 +96,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundImage: NetworkImage(userProfileImage),
               ),
             ),
-            ListTile(
-              title: Text('Shopping Cart'),
-              onTap: _openCart,
-            ),
 
             ListTile(
               title: Text('Categories'),
               onTap: _openCategories,
             ),
 
-            ListTile(
-              title: Text('Edit Profile'),
-              onTap: _editUserInfo,
-            ),
+            if (accessToken != null) ...[
+              ListTile(
+                title: Text('Shopping Cart'),
+                onTap: _openCart,
+              ),
+              ListTile(
+                title: Text('Edit Profile'),
+                onTap: _editUserInfo,
+              ),
+            ],
 
 
             ListTile(
