@@ -45,22 +45,21 @@ class ApiService {
   Future<Map<String, dynamic>?> getCurrentUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('access_token'); // دریافت توکن
+      String? accessToken = prefs.getString('access_token'); // دریافت توکن از SharedPreferences
 
       if (accessToken == null) {
         return null; // اگر توکن وجود ندارد، null برمی‌گرداند
       }
-
-      // ارسال درخواست برای دریافت اطلاعات کاربر با توکن
+      // ارسال درخواست به API برای دریافت اطلاعات کاربر با توکن
       Response response = await _dio.get(
         '$baseUrl/auth/me',
         options: Options(
-          headers: {'Authorization': 'Bearer $accessToken'},  // ارسال توکن در هدر
+          headers: {'Authorization': '$accessToken'},  // ارسال توکن در هدر
         ),
       );
 
       if (response.statusCode == 200) {
-        return response.data;  // اطلاعات کاربر جاری را برمی‌گرداند
+        return response.data;
       } else {
         return null;
       }
@@ -69,7 +68,6 @@ class ApiService {
       return null;
     }
   }
-
   // تابع برای بروزرسانی session (در صورت استفاده از refresh token)
   Future<Map<String, dynamic>?> refreshSession(String refreshToken) async {
     try {
