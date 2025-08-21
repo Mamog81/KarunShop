@@ -1,5 +1,6 @@
-import 'dart:async'; // برای استفاده از تایمر
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -10,10 +11,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // تایمر برای هدایت به صفحه Home بعد از 2 ثانیه
-    Timer(Duration(seconds: 2), () {
+    _checkLoginStatus();
+  }
+
+  // چک کردن توکن ذخیره‌شده
+  _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('access_token');  // دریافت توکن از SharedPreferences
+
+    // اگر توکن موجود باشد، به صفحه خانه هدایت می‌شود
+    if (accessToken != null) {
       Navigator.pushReplacementNamed(context, '/home');
-    });
+    } else {
+      // در غیر این صورت به صفحه ورود هدایت می‌شود
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 
   @override
