@@ -93,4 +93,26 @@ class ApiService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>?> getProductsByCategory(String category) async {
+    try {
+      Response response = await _dio.get(
+        '$baseUrl/products/category/$category',
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        print("Failed to get products for category: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching products by category: $e");
+      return null;
+    }
+  }
+
 }

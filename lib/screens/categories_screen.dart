@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:onlineshop/services/api_service.dart';
+import 'package:onlineshop/screens/category_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
   @override
-  _CategoryListScreenState createState() => _CategoryListScreenState();
+  _CategoriesScreenState createState() => _CategoriesScreenState();
 }
 
-class _CategoryListScreenState extends State<CategoriesScreen> {
+class _CategoriesScreenState extends State<CategoriesScreen> {
   List<String> categories = [];
   List<String> filteredCategories = [];
   bool isLoading = true;
@@ -40,6 +41,8 @@ class _CategoryListScreenState extends State<CategoriesScreen> {
       }
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +80,15 @@ class _CategoryListScreenState extends State<CategoriesScreen> {
                     title: Text(_formatCategoryName(filteredCategories[index])),
                     trailing: Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // اینجا onPressed رو خودت بنویس
-                      print('Selected: ${filteredCategories[index]}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CategoryScreen(
+                            category: filteredCategories[index],
+                          ),
+                        ),
+                      );
+
                     },
                   ),
                 );
