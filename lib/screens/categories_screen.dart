@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:onlineshop/services/api_service.dart';
-import 'package:onlineshop/screens/category_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/category_provider.dart';
+import 'category_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
   @override
@@ -8,41 +9,15 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  List<String> categories = [];
-  List<String> filteredCategories = [];
-  bool isLoading = true;
   TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadCategories();
-  }
-
-  _loadCategories() async {
-    var result = await ApiService().getCategories();
-    setState(() {
-      if (result != null) {
-        categories = result;
-        filteredCategories = result;
-      }
-      isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryProvider>(context, listen: false).loadCategories();
     });
   }
-
-  _searchCategories(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredCategories = categories;
-      } else {
-        filteredCategories = categories
-            .where((category) => category.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -50,62 +25,57 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       appBar: AppBar(
         title: Text('Categories'),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          // Search Box
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search categories...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+      body: Consumer<CategoryProvider>(
+        builder: (context, categoryProvider, child) {
+          if (categoryProvider.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search categories...',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onChanged: categoryProvider.searchCategories,
                 ),
               ),
-              onChanged: _searchCategories,
-            ),
-          ),
-          // Categories List
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredCategories.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.all(8),
-                  child: ListTile(
-                    title: Text(_formatCategoryName(filteredCategories[index])),
-                    trailing: Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CategoryScreen(
-                            category: filteredCategories[index],
-                          ),
-                        ),
-                      );
-
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+              Expanded(
+                child: ListView.builder(
+                  itemCount: categoryProvider.filteredCategories.length,
+                  itemBuilder: (context, index) {
+                    final category = categoryProvider.filteredCategories[index];
+                    return Card(
+                      margin: EdgeInsets.all(8),
+                      child: ListTile(
+                        title: Text(category.displayName),
+                        trailing: Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CategoryScreen(
+                                category: category.name,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
-
-  // تبدیل نام کتگوری به فرمت زیبا
-  String _formatCategoryName(String category) {
-    return category
-        .split('-')
-        .map((word) => word[0].toUpperCase() + word.substring(1))
-        .join(' ');
-  }
-
 }

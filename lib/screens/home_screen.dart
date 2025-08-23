@@ -1,142 +1,118 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:onlineshop/services/api_service.dart';  // برای استفاده از ApiService
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  String? accessToken;
-  String userName = "Guest User";
-  String userProfileImage = 'https://dummyjson.com/icon/emilys/128';
-  String userEmail = '';
-  Map<String, dynamic>? userResponse;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadToken();  // بارگذاری توکن از SharedPreferences
-  }
-
-  // بارگذاری توکن از SharedPreferences
-  _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      accessToken = prefs.getString('access_token');
-    });
-
-    // فقط اگر توکن وجود داشت، اطلاعات کاربر رو دریافت کن
-    if (accessToken != null) {
-      _getUserInfo();
-    } else {
-      // اگر توکن نبود، userResponse رو به یک Map خالی یا مقدار پیش‌فرض تنظیم کن
-      // این کار باعث میشه CircularProgressIndicator دیگه نشون داده نشه
-      setState(() {
-        userResponse = {}; // یا هر مقدار پیش‌فرض دیگری
-      });
-    }
-  }
-
-  // دریافت اطلاعات کاربر از API
-  _getUserInfo() async {
-    if (accessToken != null) {
-      var user = await ApiService().getCurrentUser();
-      if (user != null) {
-        setState(() {
-          userName = user['firstName'] + ' ' + user['lastName'];
-          userProfileImage = user['image'];
-          userEmail = user['email'];
-          userResponse = user;
-        });
-      }
-    }
-  }
-
-  // تابع برای لاگ اوت
-  void _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');  // پاک کردن توکن از SharedPreferences
-    Navigator.pushReplacementNamed(context, '/login');  // هدایت به صفحه ورود
-  }
-
-  void _editUserInfo()  {
-    Navigator.pushNamed(context, '/profile');
-  }
-
-
-  void _openCart()  {
-    Navigator.pushNamed(context, '/cart');
-  }
-
-  void _openCategories()  {
-    Navigator.pushNamed(context, '/categories');
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.shopping_cart),
-            onPressed: _openCart,
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.shopping_cart),
+                    onPressed: () => Navigator.pushNamed(context, '/cart'),
+                  ),
+                  if (cartProvider.itemCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${cartProvider.itemCount}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(userName),
-              accountEmail: Text(userEmail),
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(userProfileImage),
-              ),
+      drawer: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          return Drawer(
+            child: ListView(
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: Text(authProvider.user != null
+                      ? '${authProvider.user!.firstName} ${authProvider.user!.lastName}'
+                      : 'Guest User'),
+                  accountEmail: Text(authProvider.user?.email ?? ''),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      authProvider.user?.image ??
+                          'https://dummyjson.com/icon/emilys/128',
+                    ),
+                  ),
+                ),
+                ListTile(
+                  title: Text('َProducts'),
+                  onTap: () => Navigator.pushNamed(context, '/products'),
+                ),ListTile(
+                  title: Text('Categories'),
+                  onTap: () => Navigator.pushNamed(context, '/categories'),
+                ),
+                if (authProvider.isAuthenticated) ...[
+                  ListTile(
+                    title: Text('Shopping Cart'),
+                    onTap: () => Navigator.pushNamed(context, '/cart'),
+                  ),
+                  ListTile(
+                    title: Text('Edit Profile'),
+                    onTap: () => Navigator.pushNamed(context, '/profile'),
+                  ),
+                ],
+                ListTile(
+                  title: Text(authProvider.isAuthenticated ? 'Logout' : 'Login'),
+                  onTap: () {
+                    if (authProvider.isAuthenticated) {
+                      authProvider.logout();
+                      Navigator.pushReplacementNamed(context, '/login');
+                    } else {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    }
+                  },
+                ),
+              ],
             ),
-
-            ListTile(
-              title: Text('Categories'),
-              onTap: _openCategories,
-            ),
-
-            if (accessToken != null) ...[
-              ListTile(
-                title: Text('Shopping Cart'),
-                onTap: _openCart,
-              ),
-              ListTile(
-                title: Text('Edit Profile'),
-                onTap: _editUserInfo,
-              ),
-            ],
-
-
-            ListTile(
-              title: Text(accessToken != null ? 'Logout' : 'Login'),
-              onTap: () {
-                if (accessToken != null) {
-                  _logout();
-                } else {
-                  Navigator.pushReplacementNamed(context, '/login');  // دکمه لاگین برای مهمان
-                }
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
       body: Center(
-        child: userResponse == null
-            ? CircularProgressIndicator()  // اگر ریسپانس دریافت نشده باشد
-            : SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Welcome to the Home Page!'),
-            ],
-          ),
+        child: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            if (authProvider.isLoading) {
+              return CircularProgressIndicator();
+            }
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Welcome to the Home Page!'),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

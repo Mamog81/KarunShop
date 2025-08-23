@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -14,16 +15,13 @@ class _SplashScreenState extends State<SplashScreen> {
     _checkLoginStatus();
   }
 
-  // چک کردن توکن ذخیره‌شده
   _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('access_token');  // دریافت توکن از SharedPreferences
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.checkAuthStatus();
 
-    // اگر توکن موجود باشد، به صفحه خانه هدایت می‌شود
-    if (accessToken != null) {
+    if (authProvider.isAuthenticated) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
-      // در غیر این صورت به صفحه ورود هدایت می‌شود
       Navigator.pushReplacementNamed(context, '/login');
     }
   }
@@ -35,7 +33,11 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Text(
           'Welcome to the Online Shop!',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );

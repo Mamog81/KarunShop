@@ -14,18 +14,27 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // محاسبه قیمت با تخفیف
+    final double? price = product['price']?.toDouble();
+    final double? discount = product['discountPercentage']?.toDouble();
+    final double? discountedPrice = (price != null && discount != null)
+        ? price * (1 - discount / 100)
+        : null;
+
     return Card(
       elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // تصویر محصول
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // تصویر محصول
+              SizedBox(
+                width: 100,
+                height: 100,
                 child: product['thumbnail'] != null
                     ? Image.network(
                   product['thumbnail'],
@@ -37,78 +46,94 @@ class ProductCard extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[200],
-                      child: Icon(Icons.image, size: 50, color: Colors.grey),
+                      child: const Icon(Icons.image, size: 50, color: Colors.grey),
                     );
                   },
                 )
                     : Container(
                   color: Colors.grey[200],
-                  child: Icon(Icons.image, size: 50, color: Colors.grey),
+                  child: const Icon(Icons.image, size: 50, color: Colors.grey),
                 ),
               ),
-            ),
-
-            // اطلاعات محصول
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 9 , vertical: 5),
+              const SizedBox(width: 12),
+              // اطلاعات محصول
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // نام محصول
+                    // نام و برند محصول
                     Text(
                       product['title'] ?? 'Unknown',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: const TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-
-                    // برند (اگه داشته باشه)
                     if (product['brand'] != null)
                       Text(
                         product['brand'],
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.grey[600],
                         ),
                       ),
+                    const SizedBox(height: 8),
 
-                    Spacer(),
-
-                    // قیمت و دکمه
+                    // بخش قیمت و تخفیف
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // قیمت اصلی
-                            Text(
-                              '\$${product['price']?.toString() ?? '0'}',
-                              style: TextStyle(
-                                fontSize: 14,
+                        if (discountedPrice != null)
+                          Text(
+                            '\$${discountedPrice.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+                        if (discountedPrice != null)
+                          Text(
+                            '\$${price!.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        if (discount != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              '${discount.toStringAsFixed(0)}% off',
+                              style: const TextStyle(
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
                               ),
                             ),
+                          ),
+                      ],
+                    ),
 
-                            // ریتینگ (اگه داشته باشه)
-                            if (product['rating'] != null)
-                              Row(
-                                children: [
-                                  Icon(Icons.star, size: 12, color: Colors.amber),
-                                  Text(
-                                    product['rating'].toStringAsFixed(1),
-                                    style: TextStyle(fontSize: 10, color: Colors.grey),
-                                  ),
-                                ],
+                    // ریتینگ و دکمه
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // ریتینگ
+                        if (product['rating'] != null)
+                          Row(
+                            children: [
+                              const Icon(Icons.star, size: 16, color: Colors.amber),
+                              Text(
+                                product['rating'].toStringAsFixed(1),
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
                               ),
-                          ],
-                        ),
+                            ],
+                          ),
 
                         // دکمه افزودن به سبد
                         if (onAddToCart != null)
@@ -118,14 +143,10 @@ class ProductCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: IconButton(
-                              icon: Icon(Icons.add_shopping_cart),
+                              icon: const Icon(Icons.add_shopping_cart),
                               color: Colors.white,
                               iconSize: 16,
                               onPressed: onAddToCart,
-                              constraints: BoxConstraints(
-                                minWidth: 30,
-                                minHeight: 30,
-                              ),
                             ),
                           ),
                       ],
@@ -133,8 +154,8 @@ class ProductCard extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
