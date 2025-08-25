@@ -70,6 +70,50 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>?> updateUser(
+      int userId, {
+        required String firstName,
+        required String lastName,
+        required String email,
+        required String username,
+      }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('access_token');
+
+      if (accessToken == null) {
+        print("No access token found");
+        return null;
+      }
+
+      Response response = await _dio.put(
+        '${Constants.baseUrl}/users/$userId',
+        data: {
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+          'username': username,
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': '$accessToken',  // ارسال توکن در هدر
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        print("Failed to update user: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Error updating user: $e");
+      return null;
+    }
+  }
+
 
   // تابع برای دریافت لیست کتگوری‌ها
   Future<List<String>?> getCategories() async {

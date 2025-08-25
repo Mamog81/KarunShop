@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 
 class HomeScreen extends StatelessWidget {
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,16 +63,17 @@ class HomeScreen extends StatelessWidget {
                       : 'Guest User'),
                   accountEmail: Text(authProvider.user?.email ?? ''),
                   currentAccountPicture: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      authProvider.user?.image ??
-                          'https://dummyjson.com/icon/emilys/128',
+                    backgroundImage: authProvider.getProfileImage(
+                      authProvider.user?.localImagePath,
+                      authProvider.user?.image,
                     ),
                   ),
                 ),
                 ListTile(
                   title: Text('َProducts'),
                   onTap: () => Navigator.pushNamed(context, '/products'),
-                ),ListTile(
+                ),
+                ListTile(
                   title: Text('Categories'),
                   onTap: () => Navigator.pushNamed(context, '/categories'),
                 ),
