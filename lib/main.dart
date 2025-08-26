@@ -13,6 +13,7 @@ import 'screens/edit_profile_screen.dart';
 import 'screens/all_product_screen.dart';
 import 'screens/support_screen.dart';
 import 'screens/amazing_deals_screen.dart';
+import 'utils/constants.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,11 +30,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Online Shop',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
         initialRoute: '/',
         routes: {
           '/': (context) => SplashScreen(),
