@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../utils/constants.dart';
 
 class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shopping Cart'),
+        backgroundColor: Constants.nBlue,
+        iconTheme: IconThemeData(color: Constants.nGrey),
+        title: Text('Shopping Cart' ,style: TextStyle(color: Constants.nGrey , fontWeight: FontWeight.bold),),
         actions: [
           Consumer<CartProvider>(
             builder: (context, cartProvider, child) {
@@ -24,14 +27,14 @@ class CartScreen extends StatelessWidget {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text('Cancel'),
+                          child: Text('Cancel' , style: TextStyle(color: Constants.nCharcoal),),
                         ),
                         TextButton(
                           onPressed: () {
                             cartProvider.clearCart();
                             Navigator.pop(context);
                           },
-                          child: Text('Clear'),
+                          child: Text('Clear', style: TextStyle(color: Constants.nOrange),),
                         ),
                       ],
                     ),
@@ -58,7 +61,7 @@ class CartScreen extends StatelessWidget {
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => Navigator.pushNamed(context, '/categories'),
-                    child: Text('Start Shopping'),
+                    child: Text('Start Shopping' , style: TextStyle(color: Constants.nBlue),),
                   ),
                 ],
               ),
@@ -73,7 +76,7 @@ class CartScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = cartProvider.items[index];
                     return Card(
-                      margin: EdgeInsets.all(8),
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 6),
                       child: ListTile(
                         leading: Image.network(
                           item.product.thumbnail,
@@ -95,7 +98,7 @@ class CartScreen extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.remove),
+                              icon: Icon(Icons.remove , color: Constants.nBlue,),
                               onPressed: () {
                                 if (item.quantity > 1) {
                                   cartProvider.updateQuantity(
@@ -105,9 +108,9 @@ class CartScreen extends StatelessWidget {
                                 }
                               },
                             ),
-                            Text('${item.quantity}'),
+                            Text('${item.quantity}' , style: TextStyle(color: Constants.nBlue, fontSize: 12),),
                             IconButton(
-                              icon: Icon(Icons.add),
+                              icon: Icon(Icons.add , color: Constants.nBlue,),
                               onPressed: () {
                                 cartProvider.updateQuantity(
                                   item.product.id,
@@ -116,7 +119,7 @@ class CartScreen extends StatelessWidget {
                               },
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
+                              icon: Icon(Icons.delete, color: Constants.nOrange),
                               onPressed: () {
                                 cartProvider.removeFromCart(item.product.id);
                               },
@@ -144,7 +147,7 @@ class CartScreen extends StatelessWidget {
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Total: \${cartProvider.totalAmount.toStringAsFixed(2)}',
+                          'Total: ${cartProvider.totalAmount.toStringAsFixed(2)}',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -158,9 +161,10 @@ class CartScreen extends StatelessWidget {
                             SnackBar(content: Text('Checkout functionality coming soon!')),
                           );
                         },
-                        child: Text('Proceed to Checkout'),
+                        child: Text('Proceed to Checkout' ,style: TextStyle(fontWeight: FontWeight.bold , color: Constants.nBlue),),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: Constants.nGrey
                         ),
                       ),
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
+import '../utils/constants.dart'; // Import Constants for colors
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -21,6 +22,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.product.title),
+        backgroundColor: Constants.nBlue, // AppBar color from palette
+        foregroundColor: Colors.white,
         actions: [
           Consumer<CartProvider>(
             builder: (context, cartProvider, child) {
@@ -64,6 +67,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- Image Gallery ---
             Container(
               height: 300,
               child: Stack(
@@ -79,7 +83,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     itemBuilder: (context, index) {
                       return Image.network(
                         widget.product.images[index],
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(child: CircularProgressIndicator());
@@ -139,19 +143,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
+
+            // --- Product Details ---
             Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Product Title
                   Text(
                     widget.product.title,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Constants.nCharcoal, // Title color from palette
                     ),
                   ),
                   SizedBox(height: 8),
+
+                  // Brand Info
                   if (widget.product.brand.isNotEmpty)
                     Text(
                       'Brand: ${widget.product.brand}',
@@ -161,6 +171,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                   SizedBox(height: 8),
+
+                  // Price & Rating
                   Row(
                     children: [
                       Text(
@@ -168,7 +180,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                          color: Constants.nOrange, // Price color from palette
                         ),
                       ),
                       SizedBox(width: 16),
@@ -185,6 +197,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   SizedBox(height: 8),
 
+                  // Availability Status
                   SizedBox(height: 8),
                   Text(
                     widget.product.availabilityStatus.isNotEmpty
@@ -192,16 +205,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         : 'In Stock: ${widget.product.stock}',
                     style: TextStyle(
                       fontSize: 16,
-                      color: widget.product.stock > 0 ? Colors.green : Colors.red,
+                      color: widget.product.stock > 0
+                          ? Colors.green
+                          : Colors.red,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(height: 16),
+
+                  // Product Description
                   Text(
                     'Description',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: Constants.nCharcoal,
                     ),
                   ),
                   SizedBox(height: 8),
@@ -213,11 +231,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                   SizedBox(height: 24),
+
+                  // Customer Reviews Section
                   Text(
                     'Customer Reviews',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: Constants.nCharcoal,
                     ),
                   ),
                   SizedBox(height: 16),
@@ -263,12 +284,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: widget.product.stock > 0
-                    ? Theme.of(context).primaryColor
+                    ? Constants.nBlue // Use nBlue for available stock
                     : Colors.grey,
               ),
               child: Text(
                 widget.product.stock > 0 ? 'Add to Cart' : 'Out of Stock',
-                style: TextStyle(fontSize: 18 , color: Colors.white),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             );
           },
@@ -385,7 +406,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             return ListTile(
               leading: CircleAvatar(
                 child: Text(review.reviewerName[0].toUpperCase()),
-                backgroundColor: Colors.blue,
+                backgroundColor: Constants.nBlue,
                 foregroundColor: Colors.white,
               ),
               title: Row(

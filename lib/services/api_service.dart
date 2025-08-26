@@ -207,5 +207,29 @@ class ApiService {
   }
 
 
+  Future<Map<String, dynamic>?> getAmazingDeals() async {
+    try {
+      Response response = await _dio.get(
+        '${Constants.baseUrl}/products',
+        queryParameters: {
+          'sortBy': 'discountPercentage',
+          'order': 'desc',
+          'limit': 30,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        print("Failed to get amazing deals: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching amazing deals: $e");
+      return null;
+    }
+  }
+
+
 
 }

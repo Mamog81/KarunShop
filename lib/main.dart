@@ -7,11 +7,12 @@ import 'providers/cart_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/register_screen.dart';
 import 'screens/categories_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/all_product_screen.dart';
+import 'screens/support_screen.dart';
+import 'screens/amazing_deals_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,11 +39,12 @@ class MyApp extends StatelessWidget {
           '/': (context) => SplashScreen(),
           '/login': (context) => LoginScreen(),
           '/home': (context) => HomeScreen(),
-          '/register': (context) => RegisterScreen(),
           '/categories': (context) => CategoriesScreen(),
           '/cart': (context) => CartScreen(),
           '/profile': (context) => EditProfileScreen(),
           '/products' : (context) => AllProductsScreen(),
+          '/support' : (context) => SupportScreen(),
+          '/amazing-deals' : (context) => AmazingDealsScreen(),
         },
       ),
     );

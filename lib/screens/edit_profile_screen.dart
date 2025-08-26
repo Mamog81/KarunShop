@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../providers/auth_provider.dart';
+import '../utils/constants.dart'; // Import Constants for colors
 
 class EditProfileScreen extends StatefulWidget {
   @override
@@ -56,7 +57,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطا در انتخاب عکس: $e'),
+          content: Text('Error selecting image: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -68,13 +69,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('انتخاب عکس'),
+          title: Text('Select Image'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
                 leading: Icon(Icons.photo_library),
-                title: Text('از گالری'),
+                title: Text('From Gallery'),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImageFromSource(ImageSource.gallery);
@@ -82,7 +83,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               ListTile(
                 leading: Icon(Icons.photo_camera),
-                title: Text('از دوربین'),
+                title: Text('From Camera'),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImageFromSource(ImageSource.camera);
@@ -91,7 +92,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               if (_imageFile != null)
                 ListTile(
                   leading: Icon(Icons.delete),
-                  title: Text('حذف عکس'),
+                  title: Text('Delete Image'),
                   onTap: () {
                     Navigator.pop(context);
                     setState(() {
@@ -123,7 +124,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطا در انتخاب عکس: $e'),
+          content: Text('Error selecting image: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -156,7 +157,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('پروفایل با موفقیت به‌روزرسانی شد'),
+          content: Text('Profile updated successfully'),
           backgroundColor: Colors.green,
         ),
       );
@@ -164,7 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطا در به‌روزرسانی پروفایل'),
+          content: Text('Error updating profile'),
           backgroundColor: Colors.red,
         ),
       );
@@ -176,14 +177,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Constants.nBlue, // Matching the palette
         foregroundColor: Colors.white,
       ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           if (authProvider.user == null) {
             return Center(
-              child: Text('کاربر یافت نشد'),
+              child: Text('User not found'),
             );
           }
 
@@ -209,7 +210,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           right: 0,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: Constants.nBlue, // Button color from palette
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: Colors.white,
@@ -232,7 +233,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _firstNameController,
                     decoration: InputDecoration(
-                      labelText: 'نام',
+                      labelText: 'First Name',
                       prefixIcon: Icon(Icons.person),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -240,7 +241,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'لطفا نام خود را وارد کنید';
+                        return 'Please enter your first name';
                       }
                       return null;
                     },
@@ -252,7 +253,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _lastNameController,
                     decoration: InputDecoration(
-                      labelText: 'نام خانوادگی',
+                      labelText: 'Last Name',
                       prefixIcon: Icon(Icons.person_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -260,7 +261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'لطفا نام خانوادگی خود را وارد کنید';
+                        return 'Please enter your last name';
                       }
                       return null;
                     },
@@ -272,7 +273,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'ایمیل',
+                      labelText: 'Email',
                       prefixIcon: Icon(Icons.email),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -281,10 +282,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'لطفا ایمیل خود را وارد کنید';
+                        return 'Please enter your email';
                       }
                       if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'لطفا ایمیل معتبر وارد کنید';
+                        return 'Please enter a valid email';
                       }
                       return null;
                     },
@@ -296,7 +297,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      labelText: 'نام کاربری',
+                      labelText: 'Username',
                       prefixIcon: Icon(Icons.account_circle),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -304,7 +305,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'لطفا نام کاربری خود را وارد کنید';
+                        return 'Please enter your username';
                       }
                       return null;
                     },
@@ -319,7 +320,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _updateProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Constants.nBlue, // Use nBlue from palette
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -328,12 +329,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white)
                           : Text(
-                        'به‌روزرسانی پروفایل',
+                        'Update Profile',
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),

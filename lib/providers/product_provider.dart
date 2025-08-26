@@ -6,7 +6,9 @@ class ProductProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
 
   List<Product> _products = [];
-  List<Product> _filteredProducts = []; // لیست محصولات فیلتر شده
+  List<Product> _filteredProducts = [];
+  List<Product> _amazingDeals = [];
+
   bool _isLoading = false;
   bool _isSearching = false;
   int _skip = 0;
@@ -15,6 +17,8 @@ class ProductProvider with ChangeNotifier {
 
   List<Product> get products => _products;
   List<Product> get filteredProducts => _filteredProducts;
+  List<Product> get amazingDeals => _amazingDeals;
+
   bool get isLoading => _isLoading;
   bool get hasMore => _hasMore;
   bool get isSearching => _isSearching;
@@ -106,10 +110,30 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadAmazingDeals() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final result = await _apiService.getAmazingDeals();
+      if (result != null && result['products'] != null) {
+        _amazingDeals = (result['products'] as List)
+            .map((json) => Product.fromJson(json))
+            .toList();
+      }
+    } catch (e) {
+      print('Load amazing deals error: $e');
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   // متد پاکسازی لیست‌ها
   void clearProducts() {
     _products.clear();
     _filteredProducts.clear();
+    _amazingDeals.clear();
     _skip = 0;
     _hasMore = true;
     _isSearching = false;

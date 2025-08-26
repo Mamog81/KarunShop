@@ -4,6 +4,7 @@ import '../providers/product_provider.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/product_card.dart';
 import 'product_detail_screen.dart';
+import '../utils/constants.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String category;
@@ -48,7 +49,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_formatCategoryName(widget.category)),
+        backgroundColor: Constants.nBlue,
+        iconTheme: IconThemeData(color: Constants.nGrey),
+        title: Text(_formatCategoryName(widget.category) ,style: TextStyle(color: Constants.nGrey , fontWeight: FontWeight.bold),),
       ),
       body: Consumer<ProductProvider>(
         builder: (context, productProvider, child) {
@@ -67,22 +70,77 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    labelText: 'Search Products',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
+
+
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 30 , horizontal: 20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Constants.nBlue,
+                      Constants.nBlue.withOpacity(0.7),
+                    ],
                   ),
                 ),
-              ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Constants.nGrey,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Constants.nCharcoal.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search products...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 16,
+                      ),
+                      prefixIcon: IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: Constants.nBlue,
+                          size: 24,
+                        ),
+                        // onPressed: _onSearchPressed,
+                        onPressed: ()=>{},
+                      ),
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          color: Colors.grey[400],
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            searchController.clear();
+                          });
+                        },
+                      )
+                          : null,
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 15,
+                      ),
+                    ),                  ),
+                ),
+              )
+              ,
+
               Expanded(
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    childAspectRatio: 1.9,
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.52,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
